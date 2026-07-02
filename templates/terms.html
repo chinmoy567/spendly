@@ -4,12 +4,93 @@
 
 {% block content %}
 
-<section class="terms-container">
-    <div class="terms-inner">
-        <h1>Terms and Conditions</h1>
-        <p class="terms-last-updated">Last updated: July 2026</p>
+<style>
+.terms-section {
+    padding: 4rem 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
 
-        <div class="terms-content">
+.terms-header {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.terms-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.terms-updated {
+    font-size: 0.875rem;
+    color: var(--ink-muted);
+    font-weight: 500;
+}
+
+.terms-content {
+    line-height: 1.8;
+}
+
+.terms-section-group {
+    margin-bottom: 2.5rem;
+}
+
+.terms-section-group h2 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--accent-light);
+}
+
+.terms-section-group p {
+    color: var(--ink-muted);
+    margin-bottom: 1rem;
+    font-size: 0.975rem;
+}
+
+.terms-section-group p:last-child {
+    margin-bottom: 0;
+}
+
+.terms-section-group ul {
+    margin: 1rem 0 1rem 1.5rem;
+    color: var(--ink-muted);
+    font-size: 0.975rem;
+}
+
+.terms-section-group li {
+    margin-bottom: 0.6rem;
+    line-height: 1.6;
+}
+
+.terms-highlight {
+    background: var(--accent-light);
+    padding: 1.5rem;
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-md);
+    margin: 1.5rem 0;
+}
+
+.terms-highlight p {
+    margin-bottom: 0;
+    color: var(--ink-soft);
+    font-weight: 500;
+}
+</style>
+
+<section class="terms-section">
+    <div class="terms-header">
+        <h1>Terms and Conditions</h1>
+        <p class="terms-updated">Last updated: July 2026</p>
+    </div>
+
+    <div class="terms-content">
+        <div class="terms-section-group">
             <h2>1. Acceptance of Terms</h2>
             <p>
                 By accessing and using Spendly ("the Service"), you agree to be bound by these Terms and Conditions.
@@ -17,7 +98,9 @@
                 modify these terms at any time, and your continued use of the Service signifies your acceptance of the
                 updated terms.
             </p>
+        </div>
 
+        <div class="terms-section-group">
             <h2>2. Use of Service</h2>
             <p>
                 You agree to use Spendly solely for lawful purposes and in a way that does not infringe upon the
@@ -30,7 +113,9 @@
                 <li>Attempting to gain unauthorized access to our systems</li>
                 <li>Using the Service for commercial purposes without authorization</li>
             </ul>
+        </div>
 
+        <div class="terms-section-group">
             <h2>3. User Data</h2>
             <p>
                 We take your data privacy seriously. When you use Spendly, you provide us with personal information
@@ -42,7 +127,9 @@
                 securely and use it only to provide and improve the Service. You may request deletion of your account
                 and all associated data at any time by contacting our support team.
             </p>
+        </div>
 
+        <div class="terms-section-group">
             <h2>4. Limitations of Liability</h2>
             <p>
                 Spendly is provided on an "as-is" basis. We do not warrant that the Service will be uninterrupted,
@@ -55,7 +142,9 @@
                 We are not responsible for any errors or omissions in the information provided through the Service,
                 including miscalculated totals or categorization errors in your expense tracking.
             </p>
+        </div>
 
+        <div class="terms-section-group">
             <h2>5. Changes to Terms</h2>
             <p>
                 We may update these Terms and Conditions from time to time to reflect changes in our practices,
@@ -68,11 +157,16 @@
                 the updated terms. We encourage you to review these terms periodically to stay informed about how we
                 operate.
             </p>
+        </div>
 
+        <div class="terms-section-group">
             <h2>6. Contact Us</h2>
-            <p>
-                If you have any questions about these Terms and Conditions, please contact us at support@spendly.app
-            </p>
+            <div class="terms-highlight">
+                <p>
+                    If you have any questions about these Terms and Conditions, please contact us at
+                    <strong>support@spendly.app</strong>
+                </p>
+            </div>
         </div>
     </div>
 </section>
