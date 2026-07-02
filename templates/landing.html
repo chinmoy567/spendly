@@ -18,7 +18,7 @@
         </p>
         <div class="hero-actions">
             <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
-            <a href="#" class="btn-primary">See how it works</a>
+            <button id="see-how-it-works" class="btn-primary">See how it works</button>
         </div>
     </div>
     <div class="hero-visual">
@@ -100,5 +100,57 @@
         <a href="{{ url_for('register') }}" class="btn-primary">Create free account</a>
     </div>
 </section>
+
+<div id="video-modal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <button class="modal-close" aria-label="Close modal">&times;</button>
+        <div class="modal-video-container">
+            <iframe
+                id="modal-video"
+                class="modal-video"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                title="How Spendly Works"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const modal = document.getElementById('video-modal');
+    const openBtn = document.getElementById('see-how-it-works');
+    const closeBtn = document.querySelector('.modal-close');
+    const overlay = document.querySelector('.modal-overlay');
+    const video = document.getElementById('modal-video');
+
+    function openModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        stopVideo();
+    }
+
+    function stopVideo() {
+        video.src = video.src;
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+})();
+</script>
 
 {% endblock %}
