@@ -62,6 +62,17 @@ def create_user(name, email, password_hash):
         conn.close()
 
 
+def get_user_by_email(email):
+    """Fetch a single user row by email, or None if no match."""
+    conn = get_db()
+    try:
+        return conn.execute(
+            "SELECT * FROM users WHERE email = ?", (email,)
+        ).fetchone()
+    finally:
+        conn.close()
+
+
 def seed_db():
     """Insert one demo user and 8 sample expenses, but only if users table is empty."""
     conn = get_db()
