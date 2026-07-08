@@ -3,7 +3,7 @@ import re
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
+from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, get_user_by_id, get_expenses_by_user
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
@@ -113,7 +113,19 @@ def logout():
 def profile():
     if "user_id" not in session:
         return redirect(url_for("login"))
-    return "Profile page — coming in Step 4"
+
+    user = get_user_by_id(session["user_id"])
+    if user is None:
+        session.clear()
+        return redirect(url_for("login"))
+
+    expenses = get_expenses_by_user(session["user_id"])
+
+    total_spending = sum(expense["amount"] for expense in expenses)
+    expense_count = len(expenses)
+    recent_expenses = expenses[:5]
+
+    return render_template("profile.html", user=user, total_spending=total_spending, expense_count=expense_count, recent_expenses=recent_expenses)
 
 
 @app.route("/expenses/add")

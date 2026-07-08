@@ -73,6 +73,29 @@ def get_user_by_email(email):
         conn.close()
 
 
+def get_user_by_id(user_id):
+    """Fetch a single user row by ID, or None if no match."""
+    conn = get_db()
+    try:
+        return conn.execute(
+            "SELECT * FROM users WHERE id = ?", (user_id,)
+        ).fetchone()
+    finally:
+        conn.close()
+
+
+def get_expenses_by_user(user_id):
+    """Fetch all expenses for a user, ordered by date DESC (newest first)."""
+    conn = get_db()
+    try:
+        return conn.execute(
+            "SELECT * FROM expenses WHERE user_id = ? ORDER BY date DESC",
+            (user_id,)
+        ).fetchall()
+    finally:
+        conn.close()
+
+
 def seed_db():
     """Insert one demo user and 8 sample expenses, but only if users table is empty."""
     conn = get_db()

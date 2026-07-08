@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block content %}
+
+<section class="profile-section">
+    <div class="profile-container">
+
+        <div class="profile-header">
+            <h1 class="profile-title">Welcome back, {{ user['name'] }}</h1>
+            <p class="profile-subtitle">Here's your spending summary</p>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="info-label">Name</span>
+                    <span class="info-value">{{ user['name'] }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ user['email'] }}</span>
+                </div>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <span class="stat-label">Total Spending</span>
+                    <span class="stat-value">${{ "%.2f" | format(total_spending) }}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Expenses</span>
+                    <span class="stat-value">{{ expense_count }}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if recent_expenses %}
+        <div class="expenses-card">
+            <div class="expenses-header">
+                <h2 class="expenses-title">Recent Expenses</h2>
+            </div>
+
+            <div class="expenses-list">
+                {% for expense in recent_expenses %}
+                <div class="expense-row">
+                    <div class="expense-category">{{ expense['category'] }}</div>
+                    <div class="expense-amount">${{ "%.2f" | format(expense['amount']) }}</div>
+                    <div class="expense-date" data-date="{{ expense['date'] }}">{{ expense['date'] }}</div>
+                    <div class="expense-description">{{ expense['description'] }}</div>
+                    <div class="expense-actions">
+                        <span class="action-placeholder">Edit</span>
+                        <span class="action-placeholder">Delete</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No expenses yet. Start tracking your spending!</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<script>
+document.querySelectorAll('[data-date]').forEach(el => {
+    const dateStr = el.getAttribute('data-date');
+    const date = new Date(dateStr + 'T00:00:00');
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const formattedDate = monthNames[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+    el.textContent = formattedDate;
+});
+</script>
+
+{% endblock %}
