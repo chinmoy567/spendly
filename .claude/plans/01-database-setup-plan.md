@@ -25,16 +25,16 @@ Replace the stub with:
   - One demo user: name `Demo User`, email `demo@spendly.com`, password hashed via `generate_password_hash("demo123")`.
   - 8 sample expenses tied to that user's `lastrowid`, spread across the current month using `datetime.now().year/.month` + fixed day-of-month values (all ≤ 28, safe for February), covering all 7 categories with Food repeating once:
 
-    | day | category | amount | description |
-    |---|---|---|---|
-    | 3 | Food | 45.50 | Grocery shopping |
-    | 5 | Transport | 20.00 | Bus fare |
-    | 7 | Bills | 120.00 | Electricity bill |
-    | 10 | Health | 35.75 | Pharmacy |
-    | 14 | Entertainment | 15.00 | Movie ticket |
-    | 18 | Shopping | 60.25 | Clothing |
-    | 22 | Other | 25.00 | Miscellaneous |
-    | 26 | Food | 32.40 | Restaurant dinner |
+    | day | category      | amount | description       |
+    | --- | ------------- | ------ | ----------------- |
+    | 3   | Food          | 45.50  | Grocery shopping  |
+    | 5   | Transport     | 20.00  | Bus fare          |
+    | 7   | Bills         | 120.00 | Electricity bill  |
+    | 10  | Health        | 35.75  | Pharmacy          |
+    | 14  | Entertainment | 15.00  | Movie ticket      |
+    | 18  | Shopping      | 60.25  | Clothing          |
+    | 22  | Other         | 25.00  | Miscellaneous     |
+    | 26  | Food          | 32.40  | Restaurant dinner |
 
 - No `try/except` anywhere in this file — per spec §13, invalid SQL/FK/UNIQUE violations must propagate as normal exceptions, not be swallowed.
 - All queries parameterized (`?` placeholders) — no f-strings in SQL, per project code style.
