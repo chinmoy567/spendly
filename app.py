@@ -1,10 +1,14 @@
+import os
 import re
-from flask import Flask, render_template, request, redirect, url_for
-from werkzeug.security import generate_password_hash
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from database.db import get_db, init_db, seed_db, create_user
+from database.db import get_db, init_db, seed_db, create_user, get_user_by_email
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SECURE"] = True
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -56,8 +60,31 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    if request.method == "POST":
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+
+        error = None
+        if not EMAIL_RE.match(email):
+            error = "Invalid email or password."
+        elif not password:
+            error = "Invalid email or password."
+
+        if not error:
+            user = get_user_by_email(email)
+            if user is None or not check_password_hash(user["password_hash"], password):
+                error = "Invalid email or password."
+
+        if error:
+            return render_template("login.html", error=error, email=email)
+
+        session.clear()
+        session["user_id"] = user["id"]
+        session["user_name"] = user["name"]
+        return redirect(url_for("profile"))
+
     registered = request.args.get("registered") == "1"
     return render_template("login.html", registered=registered)
 
@@ -78,11 +105,14 @@ def privacy():
 
 @app.route("/logout")
 def logout():
-    return "Logout — coming in Step 3"
+    session.clear()
+    return redirect(url_for("landing"))
 
 
 @app.route("/profile")
 def profile():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
     return "Profile page — coming in Step 4"
 
 
