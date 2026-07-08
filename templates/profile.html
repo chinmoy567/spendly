@@ -1,97 +1,79 @@
 {% extends "base.html" %}
 
-{% block title %}My Profile — Spendly{% endblock %}
+{% block title %}Profile — Spendly{% endblock %}
 
 {% block content %}
-<div class="profile-container">
 
-    <!-- User Account Info Card -->
-    <div class="profile-card">
-        <h1>My Profile</h1>
-        <div class="profile-info">
-            <div class="info-row">
-                <span class="info-label">Name</span>
-                <span class="info-value">{{ user.name }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Email</span>
-                <span class="info-value">{{ user.email }}</span>
-            </div>
-        </div>
-    </div>
+<section class="profile-section">
+    <div class="profile-container">
 
-    <!-- Expense Summary Card -->
-    <div class="profile-card">
-        <h2>Spending Summary</h2>
-        <div class="summary-stats">
-            <div class="stat-box">
-                <span class="stat-label">Total Spending</span>
-                <span class="stat-value">${{ "%.2f" | format(total_spending) }}</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">Expenses</span>
-                <span class="stat-value">{{ expense_count }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Expense List Section -->
-    <div class="profile-card">
-        <div class="expenses-header">
-            <h2>Recent Expenses</h2>
-            <a href="{{ url_for('add_expense') }}" class="btn btn-primary">Add Expense</a>
+        <div class="profile-header">
+            <h1 class="profile-title">Welcome back, {{ user['name'] }}</h1>
+            <p class="profile-subtitle">Here's your spending summary</p>
         </div>
 
-        {% if expenses %}
-            <table class="expenses-table">
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for expense in expenses[:5] %}
-                        <tr>
-                            <td class="category-cell">{{ expense.category }}</td>
-                            <td class="amount-cell">${{ "%.2f" | format(expense.amount) }}</td>
-                            <td class="date-cell" data-date="{{ expense.date }}">{{ expense.date }}</td>
-                            <td class="description-cell">{{ expense.description or "—" }}</td>
-                            <td class="actions-cell">
-                                <a href="{{ url_for('edit_expense', id=expense.id) }}" class="action-link">Edit</a>
-                                <a href="{{ url_for('delete_expense', id=expense.id) }}" class="action-link">Delete</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="profile-card">
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="info-label">Name</span>
+                    <span class="info-value">{{ user['name'] }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ user['email'] }}</span>
+                </div>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <span class="stat-label">Total Spending</span>
+                    <span class="stat-value">${{ "%.2f" | format(total_spending) }}</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Expenses</span>
+                    <span class="stat-value">{{ expense_count }}</span>
+                </div>
+            </div>
+        </div>
+
+        {% if recent_expenses %}
+        <div class="expenses-card">
+            <div class="expenses-header">
+                <h2 class="expenses-title">Recent Expenses</h2>
+            </div>
+
+            <div class="expenses-list">
+                {% for expense in recent_expenses %}
+                <div class="expense-row">
+                    <div class="expense-category">{{ expense['category'] }}</div>
+                    <div class="expense-amount">${{ "%.2f" | format(expense['amount']) }}</div>
+                    <div class="expense-date" data-date="{{ expense['date'] }}">{{ expense['date'] }}</div>
+                    <div class="expense-description">{{ expense['description'] }}</div>
+                    <div class="expense-actions">
+                        <span class="action-placeholder">Edit</span>
+                        <span class="action-placeholder">Delete</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
         {% else %}
-            <div class="empty-state">
-                <p>No expenses yet. Start tracking your spending!</p>
-                <a href="{{ url_for('add_expense') }}" class="btn btn-primary">Add Your First Expense</a>
-            </div>
+        <div class="empty-state">
+            <p>No expenses yet. Start tracking your spending!</p>
+        </div>
         {% endif %}
+
     </div>
+</section>
 
-</div>
-{% endblock %}
-
-{% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const dateCells = document.querySelectorAll('.date-cell');
-        dateCells.forEach(cell => {
-            const dateStr = cell.getAttribute('data-date');
-            const date = new Date(dateStr + 'T00:00:00Z');
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const month = months[date.getUTCMonth()];
-            const day = String(date.getUTCDate()).padStart(2, '0');
-            const year = date.getUTCFullYear();
-            cell.textContent = `${month} ${day}, ${year}`;
-        });
-    });
+document.querySelectorAll('[data-date]').forEach(el => {
+    const dateStr = el.getAttribute('data-date');
+    const date = new Date(dateStr + 'T00:00:00');
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const formattedDate = monthNames[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+    el.textContent = formattedDate;
+});
 </script>
+
 {% endblock %}

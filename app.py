@@ -115,11 +115,17 @@ def profile():
         return redirect(url_for("login"))
 
     user = get_user_by_id(session["user_id"])
-    expenses = get_expenses_by_user(session["user_id"])
-    total_spending = sum(e["amount"] for e in expenses) or 0.0
-    expense_count = len(expenses)
+    if user is None:
+        session.clear()
+        return redirect(url_for("login"))
 
-    return render_template("profile.html", user=user, expenses=expenses, total_spending=total_spending, expense_count=expense_count)
+    expenses = get_expenses_by_user(session["user_id"])
+
+    total_spending = sum(expense["amount"] for expense in expenses)
+    expense_count = len(expenses)
+    recent_expenses = expenses[:5]
+
+    return render_template("profile.html", user=user, total_spending=total_spending, expense_count=expense_count, recent_expenses=recent_expenses)
 
 
 @app.route("/expenses/add")
