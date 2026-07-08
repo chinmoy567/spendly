@@ -1,8 +1,12 @@
-from flask import Flask, render_template
+import re
+from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.security import generate_password_hash
 
-from database.db import get_db, init_db, seed_db
+from database.db import get_db, init_db, seed_db, create_user
 
 app = Flask(__name__)
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 with app.app_context():
     init_db()
@@ -18,14 +22,44 @@ def landing():
     return render_template("landing.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        error = None
+
+        if not name:
+            error = "Please enter your name."
+        elif not EMAIL_RE.match(email):
+            error = "Please enter a valid email address."
+        elif len(password) < 6:
+            error = "Password must be at least 6 characters."
+        elif password != confirm_password:
+            error = "Passwords do not match."
+
+        if error:
+            return render_template("register.html", error=error, name=name, email=email)
+
+        password_hash = generate_password_hash(password)
+        user_id = create_user(name, email, password_hash)
+
+        if user_id is None:
+            error = "An account with this email already exists."
+            return render_template("register.html", error=error, name=name, email=email)
+
+        return redirect(url_for("login", registered="1"))
+
     return render_template("register.html")
 
 
 @app.route("/login")
 def login():
-    return render_template("login.html")
+    registered = request.args.get("registered") == "1"
+    return render_template("login.html", registered=registered)
 
 
 @app.route("/terms")
