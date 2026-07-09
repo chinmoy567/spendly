@@ -739,10 +739,59 @@ a { color: inherit; text-decoration: none; }
     .expense-actions { gap: 0.5rem; }
 }
 
+/* ------------------------------------------------------------------ */
+/* Date Filter Form                                                    */
+/* ------------------------------------------------------------------ */
+
+.filter-form {
+    margin-bottom: 1.5rem;
+}
+
+.filter-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 150px;
+    margin-bottom: 0;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin-bottom: 0.5rem;
+}
+
+.btn-filter {
+    padding: 0.625rem 1.5rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-filter:hover {
+    background: var(--accent);
+}
+
 @media (max-width: 600px) {
     .profile-section { padding: 2rem 1rem; }
     .profile-header { margin-bottom: 1.5rem; }
     .profile-title { font-size: 1.5rem; }
     .profile-card, .expenses-card { padding: 1.5rem; }
     .info-row { grid-template-columns: auto 1fr; }
+    .filter-row { flex-direction: column; align-items: stretch; }
+    .filter-group { min-width: unset; }
+    .btn-filter { width: 100%; }
 }

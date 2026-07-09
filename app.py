@@ -3,7 +3,7 @@ import re
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, get_user_by_id, get_expenses_by_user
+from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, get_user_by_id, get_expenses_by_user, get_expenses_by_user_date_range
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
@@ -119,13 +119,29 @@ def profile():
         session.clear()
         return redirect(url_for("login"))
 
-    expenses = get_expenses_by_user(session["user_id"])
+    start_date = request.args.get("start_date", "").strip()
+    end_date = request.args.get("end_date", "").strip()
+    filter_error = None
+
+    if start_date or end_date:
+        if start_date and end_date:
+            if start_date > end_date:
+                filter_error = "Start date must be before end date."
+                expenses = get_expenses_by_user(session["user_id"])
+                start_date = ""
+                end_date = ""
+            else:
+                expenses = get_expenses_by_user_date_range(session["user_id"], start_date, end_date)
+        else:
+            expenses = get_expenses_by_user_date_range(session["user_id"], start_date if start_date else None, end_date if end_date else None)
+    else:
+        expenses = get_expenses_by_user(session["user_id"])
 
     total_spending = sum(expense["amount"] for expense in expenses)
     expense_count = len(expenses)
     recent_expenses = expenses[:5]
 
-    return render_template("profile.html", user=user, total_spending=total_spending, expense_count=expense_count, recent_expenses=recent_expenses)
+    return render_template("profile.html", user=user, total_spending=total_spending, expense_count=expense_count, recent_expenses=recent_expenses, start_date=start_date, end_date=end_date, filter_error=filter_error)
 
 
 @app.route("/expenses/add")

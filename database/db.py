@@ -96,6 +96,27 @@ def get_expenses_by_user(user_id):
         conn.close()
 
 
+def get_expenses_by_user_date_range(user_id, start_date=None, end_date=None):
+    """Fetch expenses for a user within a date range, ordered by date DESC.
+    If start_date or end_date are None, they are not applied to the filter."""
+    conn = get_db()
+    try:
+        query = "SELECT * FROM expenses WHERE user_id = ?"
+        params = [user_id]
+
+        if start_date:
+            query += " AND date >= ?"
+            params.append(start_date)
+        if end_date:
+            query += " AND date <= ?"
+            params.append(end_date)
+
+        query += " ORDER BY date DESC"
+        return conn.execute(query, params).fetchall()
+    finally:
+        conn.close()
+
+
 def seed_db():
     """Insert one demo user and 8 sample expenses, but only if users table is empty."""
     conn = get_db()
