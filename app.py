@@ -1,9 +1,13 @@
 import os
 import re
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database.db import get_db, init_db, seed_db, create_user, get_user_by_email, get_user_by_id, get_expenses_by_user
+from database.db import (
+    get_db, init_db, seed_db, create_user, get_user_by_email, get_user_by_id,
+    get_expenses_by_user, get_expenses_by_user_date_range
+)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
@@ -11,6 +15,38 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SECURE"] = True
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def parse_date_filter(args):
+    """Parse and validate date filter parameters from request.args.
+
+    Returns a tuple (start_date, end_date, error) where error is None if valid,
+    or an error message string if validation failed. Invalid dates are treated
+    as absent (None) rather than being passed through.
+    """
+    start_date = args.get("start_date", "").strip()
+    end_date = args.get("end_date", "").strip()
+
+    if not start_date and not end_date:
+        return None, None, None
+
+    if start_date:
+        try:
+            datetime.strptime(start_date, "%Y-%m-%d")
+        except ValueError:
+            start_date = None
+
+    if end_date:
+        try:
+            datetime.strptime(end_date, "%Y-%m-%d")
+        except ValueError:
+            end_date = None
+
+    if start_date and end_date and start_date > end_date:
+        return start_date, end_date, "Start date must be before end date."
+
+    return start_date, end_date, None
+
 
 with app.app_context():
     init_db()
@@ -119,13 +155,27 @@ def profile():
         session.clear()
         return redirect(url_for("login"))
 
-    expenses = get_expenses_by_user(session["user_id"])
+    start_date, end_date, filter_error = parse_date_filter(request.args)
+
+    if start_date or end_date:
+        expenses = get_expenses_by_user_date_range(session["user_id"], start_date, end_date)
+    else:
+        expenses = get_expenses_by_user(session["user_id"])
 
     total_spending = sum(expense["amount"] for expense in expenses)
     expense_count = len(expenses)
     recent_expenses = expenses[:5]
 
-    return render_template("profile.html", user=user, total_spending=total_spending, expense_count=expense_count, recent_expenses=recent_expenses)
+    return render_template(
+        "profile.html",
+        user=user,
+        total_spending=total_spending,
+        expense_count=expense_count,
+        recent_expenses=recent_expenses,
+        start_date=start_date or "",
+        end_date=end_date or "",
+        filter_error=filter_error,
+    )
 
 
 @app.route("/expenses/add")
